@@ -61,11 +61,7 @@ class LeftPanel(wx.Panel):
         self.dataTemplateTc = wx.TextCtrl(self,
                                           -1,
                                           value = #Default path to data template
-                                            '/Users/victorgeislinger/Dropbox/'+
-                                            'Desktop_Groups/Projects/Thesis/'+
-                                            'Salmon/simulation/'+
-                                            'regression.14.06.01/'+
-                                            'data_mod.2104.06.01/'+
+                                            'Data/'+
                                             'templateTest.csv')
         dataTemplateLocHbox.Add(self.dataTemplateTc, 1)
         # Add to overall sizer
@@ -91,11 +87,8 @@ class LeftPanel(wx.Panel):
         self.dataFileTc = wx.TextCtrl(self,
                                       -1,
                                       value = #Default path to site data
-                                        '/Users/victorgeislinger/Dropbox/'+
-                                        'Desktop_Groups/Projects/Thesis/'+
-                                        'Salmon/simulation/'+
-                                        'regression.14.06.01/'+
-                                        'data_mod.2104.06.01/siteTest.csv')
+                                        'Data/'+
+                                        'siteTest.csv')
         dataFileLocHbox.Add(self.dataFileTc, 1)
         # Add to overall sizer
         self.vbox.Add(dataFileLocHbox,
@@ -163,9 +156,18 @@ class LeftPanel(wx.Panel):
         dropMenuHbox = wx.BoxSizer(wx.HORIZONTAL)
         # ComboBox (see pg.86 of wxPython tutorial )
         # Example of dropdown values (use event to do this)
-        exList = ['v1: "Gravel Volume (m^3)"', 'v2: "Vegetation Cover"']
-        self.dropMenu = wx.ComboBox(self, -1, choices=exList, style=wx.CB_READONLY)
-        dropMenuHbox.Add(self.dropMenu)
+        # Choices of variables to choose constructed and river redds
+        reddsVarChoices =  [] #['v1: "Gravel Volume (m^3)"', 'v2: "Vegetation Cover"']]
+        # Drop menu for the number of redds constructed at site
+        self.constReddsDropMenu = wx.ComboBox(self, -1, 
+        									  choices=reddsVarChoices, 
+        									  style=wx.CB_READONLY)
+        dropMenuHbox.Add(self.constReddsDropMenu)
+        # Drop menu for the number of redds constructed throughout river        
+        self.riverReddsDropMenu = wx.ComboBox(self, -1, 
+        									  choices=reddsVarChoices, 
+        									  style=wx.CB_READONLY)
+        dropMenuHbox.Add(self.riverReddsDropMenu)
         # Add to overall sizer
         self.vbox.Add(dropMenuSubTitleHbox,
                       0,
@@ -254,8 +256,8 @@ class LeftPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON,
                   self.OnFindTemplateFile,
                   id=browseForTemplateBtn.GetId())
-#         # Set event for drop down menu select
-#         self.varSelectDropMenu.Bind(wx.EVT_COMBOBOX, self.OnComboSelect)
+         # Set event for drop down menu select
+         #self.varSelectDropMenu.Bind(wx.EVT_COMBOBOX, self.OnComboSelect)
         # Set event when the number of fit parameters increase/decrease
         self.Bind(wx.EVT_SPINCTRL, self.OnParamNumSelect)
 
@@ -364,7 +366,7 @@ class LeftPanel(wx.Panel):
 
 
     # Sets data for redds constructed percentage
-    def calculateReddPercent(posReddNum,posReddTotal):
+    def calculateReddPercent(self,posReddNum,posReddTotal):
         ## TEST - Must choose this later
         # redds constructed at site
         constRedds = [self.siteData[0][posReddNum]]
@@ -381,7 +383,8 @@ class LeftPanel(wx.Panel):
                                  for x,y in zip(constRedd,riverRedd) ]
             self.percentRedds[i] = percentReddsTemp
             i+=1
-
+        #TEST
+        print self.percentRedds
 
     # Perform actions to import data
     def OnImportData(self,event):
@@ -435,17 +438,17 @@ class LeftPanel(wx.Panel):
         self.varDict = {}
         for key in keys:
             # Add variable name by description (variable name then details)
-            #self.varDict['%d-%s' %(i,key)] = 'v[%d]' %i
-            self.varDict['v[%d]' %i] = '%d-%s' %(i,key)
+            varSeparator = '-' #seperator between var's number and descrition
+            self.varDict['v[%d]' %i] = '%d%s%s' %(i,varSeparator,key)
             i += 1
         # Add details
         varNames = self.varDict.keys()
         varNames.sort()
         #self.varSelectDropMenu.SetItems(varNames)
 
-
-        # self.siteData = values
-
+        # Reset the drop menus to calculate redds percentage
+        self.constReddsDropMenu.Clear()
+        self.riverReddsDropMenu.Clear()
         # Reset the button array
         self.varButtonArrayVbox.Clear(True) #delete_windows=True
         # Initial horizontal sizer to put in varButtonArrayVbox
@@ -453,19 +456,23 @@ class LeftPanel(wx.Panel):
         # Add variables as buttons in an array
         counter = 0
         for varName in varNames:
-            # Get rid of position part of string
-            titleStr = self.varDict[varName][2:]
-            buttonVbox = self.CreateButton(varName,titleStr)
-            # After every third button, form a new row
-            if (counter%3 == 0):
-                # Add (completed) row to the vertical sizer (button array)
-                self.varButtonArrayVbox.Add(varButtonArrayRow, 0, wx.ALL, 5)
-                # Make new row
-                varButtonArrayRow = wx.BoxSizer(wx.HORIZONTAL)
-            # Add to button to row
-            varButtonArrayRow.Add(buttonVbox, 0, wx.ALL, 10)
-            counter += 1
-        # Add leftover in row
+			# Get rid of position part of string for the idenitfier
+			titleStr = self.varDict[varName]
+			titleStr = titleStr[titleStr.find(varSeparator)+1:] #remove number
+			# Add variables into the drop menus
+			self.constReddsDropMenu.Append(titleStr)
+			self.riverReddsDropMenu.Append(titleStr)
+			buttonVbox = self.CreateButton(varName,titleStr)
+			# After every third button, form a new row
+			if (counter%3 == 0):
+			    # Add (completed) row to the vertical sizer (button array)
+			    self.varButtonArrayVbox.Add(varButtonArrayRow, 0, wx.ALL, 5)
+			    # Make new row
+			    varButtonArrayRow = wx.BoxSizer(wx.HORIZONTAL)
+			# Add to button to row
+			varButtonArrayRow.Add(buttonVbox, 0, wx.ALL, 10)
+			counter += 1
+			# Add leftover in row
         self.varButtonArrayVbox.Add(varButtonArrayRow, 0, wx.ALL, 5)
 
         # Refresh the frame
@@ -526,11 +533,7 @@ class LeftPanel(wx.Panel):
         try:
             # Convert alpha to numbers
             alpha = [float(a.GetValue()) for a in self.alpha]
-            # print alpha
-            # alpha = [ 1.97692763e+01,
-            #          -2.18681671e-03,
-            #          -4.63475834e-02,
-            #           1.88316523e-04]
+
             # Get output of fit
             alpha = fit_data( alpha, self.percentRedds, self.siteData,\
                                     fitEq, rangeOfVars, "temp", dt, yrs)
@@ -539,6 +542,7 @@ class LeftPanel(wx.Panel):
                                for i in range(len(alpha))]
             self.resultsPanel.fitParamStr.SetLabel('\n'.join(paramResultStr))
 
+            # Show image of results
             image = wx.ImageFromBitmap(wx.Bitmap('figure_temp_0.png'))
             image = image.Scale(600, 450, wx.IMAGE_QUALITY_HIGH)
             result = wx.BitmapFromImage(image)
