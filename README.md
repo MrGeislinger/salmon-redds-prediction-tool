@@ -1,4 +1,4 @@
-Predicting Preference of Salmon Spawning Preference Through Number of Redds & River Parameters
+Predicting Salmon Spawning Preference Through Number of Redds & River Parameters
 ============================
 
 ## Quick Summary of Project
