@@ -57,4 +57,10 @@ the parameters cannot be adjusted anymore (within a threshold). In essence this
 is a least squares regression test where the user has defined the fit equation for 
 the data.
 
+##How to Use the Tool
 
+The following explains how the GUI tool is used. Note that there might be a few 
+issues in the graphics such as scrolling bars not appearing until window is re-
+sized or not giving the user a warning when an invalid operation is attempted 
+(other than any warnings in the Python terminal). However, the tool should be 
+usable in the following manner even with these bugs.
