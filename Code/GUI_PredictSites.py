@@ -153,27 +153,22 @@ class LeftPanel(wx.Panel):
         dropMenuSubTitleStr.SetFont(subTitleFont)
         dropMenuSubTitleHbox.Add(dropMenuSubTitleStr, 0, wx.RIGHT, 8)
         # Drop-down menus
-        dropMenuHbox = wx.BoxSizer(wx.HORIZONTAL)
-        # ComboBox (see pg.86 of wxPython tutorial )
-        # Example of dropdown values (use event to do this)
-        # Choices of variables to choose constructed and river redds
-        reddsVarChoices =  [] #['v1: "Gravel Volume (m^3)"', 'v2: "Vegetation Cover"']]
-        # Drop menu for the number of redds constructed at site
-        self.constReddsDropMenu = wx.ComboBox(self, -1, 
-        									  choices=reddsVarChoices, 
-        									  style=wx.CB_READONLY)
-        dropMenuHbox.Add(self.constReddsDropMenu)
-        # Drop menu for the number of redds constructed throughout river        
-        self.riverReddsDropMenu = wx.ComboBox(self, -1, 
-        									  choices=reddsVarChoices, 
-        									  style=wx.CB_READONLY)
-        dropMenuHbox.Add(self.riverReddsDropMenu)
+        reddPercentCalcuateBox = wx.BoxSizer(wx.HORIZONTAL)
+        # Before text field, place string to the left
+        self.funcFitXequals = wx.StaticText(self, -1, 'Redd Percentage  = ')
+        self.funcFitXequals.SetFont(font)
+        reddPercentCalcuateBox.Add(self.funcFitXequals, 0, wx.RIGHT, 8)
+        # Text Field
+        self.reddPercentCalculateTc = wx.TextCtrl(self, -1)
+        # Fill in what variable to calculate redd percentage
+        self.reddPercentCalculateTc.SetValue('')
+        reddPercentCalcuateBox.Add(self.reddPercentCalculateTc, 1)
         # Add to overall sizer
         self.vbox.Add(dropMenuSubTitleHbox,
                       0,
                       wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
                       10)
-        self.vbox.Add(dropMenuHbox,
+        self.vbox.Add(reddPercentCalcuateBox,
                       0,
                       wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
                       10)
@@ -300,14 +295,14 @@ class LeftPanel(wx.Panel):
         self.parentFrame.Fit()
 
 
-#     # Add chosen varaible from drop down menu to the fit function
-#     def OnComboSelect(self,event):
-#         # Get selected item from drop menu
-#         self.dropMenuSelected = self.varSelectDropMenu.GetValue()
-#         # use just the varaible name
-#         chosenVar = self.varDict[self.dropMenuSelected]
-#         # Insert in fit function at cursorx
-#         self.funcFitTc.WriteText(chosenVar)
+    # # Add chosen varaible from drop down menu to the fit function
+    # def OnComboSelect(self,event):
+    #     # Get selected item from drop menu
+    #     self.dropMenuSelected = self.varSelectDropMenu.GetValue()
+    #     # use just the varaible name
+    #     chosenVar = self.varDict[self.dropMenuSelected]
+    #     # Insert in fit function at cursorx
+    #     self.funcFitTc.WriteText(chosenVar)
 
     # Add chosen variable from button to the fit function
     def OnVarSelect(self,event):
@@ -368,6 +363,7 @@ class LeftPanel(wx.Panel):
     # Sets data for redds constructed percentage
     def calculateReddPercent(self,posReddNum,posReddTotal):
         ## TEST - Must choose this later
+        print self.siteData[0]
         # redds constructed at site
         constRedds = [self.siteData[0][posReddNum]]
         ## Breaking down the parts
@@ -403,7 +399,8 @@ class LeftPanel(wx.Panel):
         # Just renaming for easier reading in function
         self.siteData = [values]
 
-        self.calculateReddPercent(4,3)
+        #Choose the calculated percent after import
+        self.calculateReddPercent(2,3)
 
         # ## TEST - Must choose this later
         # ## Breaking down the parts
@@ -447,8 +444,8 @@ class LeftPanel(wx.Panel):
         #self.varSelectDropMenu.SetItems(varNames)
 
         # Reset the drop menus to calculate redds percentage
-        self.constReddsDropMenu.Clear()
-        self.riverReddsDropMenu.Clear()
+        # self.constReddsDropMenu.Clear()
+        # self.riverReddsDropMenu.Clear()
         # Reset the button array
         self.varButtonArrayVbox.Clear(True) #delete_windows=True
         # Initial horizontal sizer to put in varButtonArrayVbox
@@ -459,9 +456,6 @@ class LeftPanel(wx.Panel):
 			# Get rid of position part of string for the idenitfier
 			titleStr = self.varDict[varName]
 			titleStr = titleStr[titleStr.find(varSeparator)+1:] #remove number
-			# Add variables into the drop menus
-			self.constReddsDropMenu.Append(titleStr)
-			self.riverReddsDropMenu.Append(titleStr)
 			buttonVbox = self.CreateButton(varName,titleStr)
 			# After every third button, form a new row
 			if (counter%3 == 0):
@@ -479,6 +473,34 @@ class LeftPanel(wx.Panel):
         self.parentFrame.hbox.Layout()
         self.parentFrame.Fit()
 
+    # Returns list of variable numbers (formatted 'v[#]') from function string
+    def varNumsFromString(self,functionString):
+        # Store variable numbers in list
+        varNumsList = [] 
+        while True:
+            # Find the next "v["
+            try:
+                str0 = 'v['
+                index = functionString.index(str0)
+                # Remove all the stuff beofre
+                functionString = functionString[indext+len(str0):]
+                # Get the number until "]"
+                try:
+                    str1 = ']'
+                    index = functionString.index(str1)
+                    # Save number
+                    num = functionString[:index]
+                    # Get the rest of the string
+                    functionString = functionString[index+len(str1):]
+                    # Add to variable array
+                    varNumsList.append(int(num))
+                # Failure to get end of varaible
+                except:
+                    break
+            # Failure to get beginning of variable
+            except:
+                break
+        return varNumsList
 
     # Performs fit after button press
     def OnPerformFit(self,event):
@@ -487,41 +509,14 @@ class LeftPanel(wx.Panel):
 
         # Get Fit Function
         functString = self.funcFitTc.GetValue()
-        # Define function
+        # Define a function that will evaluate the one given
         def fitEq(a,x,v):
-            # Evaluate string
+            # Evaluate string (replacing a, x and v)
             result = eval(functString)
             return result
 
         # Get what varaibles are used
-        # Make variable storage
-        rangeOfVars = []
-        # Copy over string
-        tempStr = functString
-        # Loop through until all "v[n]" are found
-        while True:
-            # Find the next "v["
-            try:
-                str0 = 'v['
-                index = tempStr.index(str0)
-                # Remove all the stuff beofre
-                tempStr = tempStr[indext+len(str0):]
-                # Get the number until "]"
-                try:
-                    str1 = ']'
-                    index = tempStr.index(str1)
-                    # Save number
-                    num = tempStr[:index]
-                    # Get the rest of the string
-                    tempStr = tempStr[index+len(str1):]
-                    # Add to variable array
-                    rangeOfVars.append(int(num))
-                # Failure to get end of varaible
-                except:
-                    break
-            # Failure to get beginning of variable
-            except:
-                break
+        rangeOfVars = self.varNumsFromString(functString)
 
         #TEST Input
         dt = 1    #increase time (1 = one year)
@@ -555,8 +550,7 @@ class LeftPanel(wx.Panel):
             # Stop running
             print "STOPPED!!!"
 
-
-
+        #Make the winodow large enough
         # newSize = (1000,2500)
         # self.parentFrame.SetSize(newSize)
         # self.parentFrame.Centre()
