@@ -8,8 +8,6 @@ from predictSitesGeneral import fit_data
 class LeftPanel(wx.Panel):
     def __init__(self, parent, id):
         wx.Panel.__init__(self, parent, id, style=wx.BORDER_SUNKEN)
-        #
-        self.calculateReddPercent
 
         # Get  encompassing window
         self.parentFrame = parent.GetParent()
@@ -18,12 +16,15 @@ class LeftPanel(wx.Panel):
         # Set size
         # self.SetSize((500,500))
 
-        ##List of class varaibles
+        # List of class varaibles
         self.dropMenuSelected = ''
         self.varDict = {}
         self.siteData = []
         self.percentRedds = []
         self.alpha = []
+
+        # Functions
+        self.varNumsFromString
 
         # Set Fonts
         titleFont = wx.SystemSettings_GetFont(wx.SYS_SYSTEM_FONT)
@@ -143,15 +144,15 @@ class LeftPanel(wx.Panel):
         self.vbox.Add((-1, 15))
 
 
-        ## Drop-down menu to choose percent of redds constructed
-        dropMenuSubTitleHbox = wx.BoxSizer(wx.HORIZONTAL)
+        ## Function input to calculate percent of redds constructed
+        reddPercentSubTitleHbox = wx.BoxSizer(wx.HORIZONTAL)
         # Subtitle
-        dropMenuSubTitleStr = wx.StaticText(self,
+        reddPercentSubTitleStr = wx.StaticText(self,
                                             -1,
                                             'Select For Percentage of '+
                                             'Redds Constructed:')
-        dropMenuSubTitleStr.SetFont(subTitleFont)
-        dropMenuSubTitleHbox.Add(dropMenuSubTitleStr, 0, wx.RIGHT, 8)
+        reddPercentSubTitleStr.SetFont(subTitleFont)
+        reddPercentSubTitleHbox.Add(reddPercentSubTitleStr, 0, wx.RIGHT, 8)
         # Drop-down menus
         reddPercentCalcuateBox = wx.BoxSizer(wx.HORIZONTAL)
         # Before text field, place string to the left
@@ -161,10 +162,10 @@ class LeftPanel(wx.Panel):
         # Text Field
         self.reddPercentCalculateTc = wx.TextCtrl(self, -1)
         # Fill in what variable to calculate redd percentage
-        self.reddPercentCalculateTc.SetValue('')
+        self.reddPercentCalculateTc.SetValue('v[4]/v[3]')
         reddPercentCalcuateBox.Add(self.reddPercentCalculateTc, 1)
         # Add to overall sizer
-        self.vbox.Add(dropMenuSubTitleHbox,
+        self.vbox.Add(reddPercentSubTitleHbox,
                       0,
                       wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP,
                       10)
@@ -251,8 +252,6 @@ class LeftPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON,
                   self.OnFindTemplateFile,
                   id=browseForTemplateBtn.GetId())
-         # Set event for drop down menu select
-         #self.varSelectDropMenu.Bind(wx.EVT_COMBOBOX, self.OnComboSelect)
         # Set event when the number of fit parameters increase/decrease
         self.Bind(wx.EVT_SPINCTRL, self.OnParamNumSelect)
 
@@ -289,20 +288,9 @@ class LeftPanel(wx.Panel):
             tempHbox.Add(alphaValue,0,wx.ALL,5)
             self.varParamArrayVbox.Add(tempHbox,0,wx.ALL,5)
 
-
         # Refresh the frame
         self.parentFrame.hbox.Layout()
         self.parentFrame.Fit()
-
-
-    # # Add chosen varaible from drop down menu to the fit function
-    # def OnComboSelect(self,event):
-    #     # Get selected item from drop menu
-    #     self.dropMenuSelected = self.varSelectDropMenu.GetValue()
-    #     # use just the varaible name
-    #     chosenVar = self.varDict[self.dropMenuSelected]
-    #     # Insert in fit function at cursorx
-    #     self.funcFitTc.WriteText(chosenVar)
 
     # Add chosen variable from button to the fit function
     def OnVarSelect(self,event):
@@ -360,28 +348,6 @@ class LeftPanel(wx.Panel):
         return buttonVbox
 
 
-    # Sets data for redds constructed percentage
-    def calculateReddPercent(self,posReddNum,posReddTotal):
-        ## TEST - Must choose this later
-        print self.siteData[0]
-        # redds constructed at site
-        constRedds = [self.siteData[0][posReddNum]]
-        ## Breaking down the parts
-        riverRedds = [self.siteData[0][posReddTotal]]
-        # save empty fields with the proper length that will be zipped below
-        self.percentRedds = [None] * max( len(riverRedds), len(constRedds) )
-
-        #
-        i = 0
-        # save percents into the empty array
-        for (riverRedd,constRedd) in zip(riverRedds,constRedds):
-            percentReddsTemp = [ float(x)/float(y)
-                                 for x,y in zip(constRedd,riverRedd) ]
-            self.percentRedds[i] = percentReddsTemp
-            i+=1
-        #TEST
-        print self.percentRedds
-
     # Perform actions to import data
     def OnImportData(self,event):
         from importData import importData
@@ -395,29 +361,8 @@ class LeftPanel(wx.Panel):
         # noneActionChosen = "convertToZero"
         # sites = noneDataAction[noneActionChosen]([values])
 
-        ##ADDITION
         # Just renaming for easier reading in function
         self.siteData = [values]
-
-        #Choose the calculated percent after import
-        self.calculateReddPercent(2,3)
-
-        # ## TEST - Must choose this later
-        # ## Breaking down the parts
-        # riverRedds = [self.siteData[0][3]]
-        # # redds constructed at site
-        # constRedds = [self.siteData[0][4]]
-        # # save empty fields with the proper length that will be zipped below
-        # self.percentRedds = [None] * max( len(riverRedds), len(constRedds) )
-        #
-        # #
-        # i = 0
-        # # save percents into the empty array
-        # for (riverRedd,constRedd) in zip(riverRedds,constRedds):
-        #     percentReddsTemp = [ float(x)/float(y)
-        #                          for x,y in zip(constRedd,riverRedd) ]
-        #     self.percentRedds[i] = percentReddsTemp
-        #     i+=1
 
         # Create new parameter list (just for this time `t`)
         # If only one parameter for each time, make it a list (list within list)
@@ -441,11 +386,7 @@ class LeftPanel(wx.Panel):
         # Add details
         varNames = self.varDict.keys()
         varNames.sort()
-        #self.varSelectDropMenu.SetItems(varNames)
 
-        # Reset the drop menus to calculate redds percentage
-        # self.constReddsDropMenu.Clear()
-        # self.riverReddsDropMenu.Clear()
         # Reset the button array
         self.varButtonArrayVbox.Clear(True) #delete_windows=True
         # Initial horizontal sizer to put in varButtonArrayVbox
@@ -453,20 +394,20 @@ class LeftPanel(wx.Panel):
         # Add variables as buttons in an array
         counter = 0
         for varName in varNames:
-			# Get rid of position part of string for the idenitfier
-			titleStr = self.varDict[varName]
-			titleStr = titleStr[titleStr.find(varSeparator)+1:] #remove number
-			buttonVbox = self.CreateButton(varName,titleStr)
-			# After every third button, form a new row
-			if (counter%3 == 0):
-			    # Add (completed) row to the vertical sizer (button array)
-			    self.varButtonArrayVbox.Add(varButtonArrayRow, 0, wx.ALL, 5)
-			    # Make new row
-			    varButtonArrayRow = wx.BoxSizer(wx.HORIZONTAL)
-			# Add to button to row
-			varButtonArrayRow.Add(buttonVbox, 0, wx.ALL, 10)
-			counter += 1
-			# Add leftover in row
+            # Get rid of position part of string for the idenitfier
+            titleStr = self.varDict[varName]
+            titleStr = titleStr[titleStr.find(varSeparator)+1:] #remove number
+            buttonVbox = self.CreateButton(varName,titleStr)
+            # After every third button, form a new row
+            if (counter%3 == 0):
+                # Add (completed) row to the vertical sizer (button array)
+                self.varButtonArrayVbox.Add(varButtonArrayRow, 0, wx.ALL, 5)
+                # Make new row
+                varButtonArrayRow = wx.BoxSizer(wx.HORIZONTAL)
+            # Add to button to row
+            varButtonArrayRow.Add(buttonVbox, 0, wx.ALL, 10)
+            counter += 1
+            # Add leftover in row
         self.varButtonArrayVbox.Add(varButtonArrayRow, 0, wx.ALL, 5)
 
         # Refresh the frame
@@ -506,6 +447,16 @@ class LeftPanel(wx.Panel):
     def OnPerformFit(self,event):
         # Set to show results
         self.parentFrame.showResults = True
+
+        # Choose the calculated percent after import
+        # Iterate each part (broken by time)
+        for v in self.siteData:
+            # Convert elements to float (for assurance)
+            v = map(float,v)
+            # Append result to list
+            self.percentRedds.append( eval(eqStr))
+        # List within list is needed for predicting method
+        self.percentRedds = [self.percentRedds]
 
         # Get Fit Function
         functString = self.funcFitTc.GetValue()
@@ -555,7 +506,6 @@ class LeftPanel(wx.Panel):
         # self.parentFrame.SetSize(newSize)
         # self.parentFrame.Centre()
 
-
 class RightPanel(wx.Panel):
     def __init__(self, parent, id):
         wx.Panel.__init__(self, parent, id, style=wx.BORDER_SUNKEN)
@@ -570,8 +520,6 @@ class RightPanel(wx.Panel):
 
         # Set vertical sizer
         self.vbox = wx.BoxSizer(wx.VERTICAL)
-
-
 
         # Set title box of panel
         titleHbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -601,13 +549,10 @@ class RightPanel(wx.Panel):
         # Add to overall sizer
         self.vbox.Add(graphHbox, 0,  wx.CENTER | wx.TOP, 10)
         self.vbox.Add((-1, 15))
-
-
         #
         self.SetSizer(self.vbox)
         self.Centre()
         self.Show(True)
-
 
 class Communicate(wx.Frame):
     def __init__(self, parent, id, title):
@@ -635,9 +580,6 @@ class Communicate(wx.Frame):
         self.Update
         # self.Left()#Centre()
         self.Show(True)
-
-
-
 
 app = wx.App()
 Communicate(None, -1, 'widgets communicate')
