@@ -447,8 +447,8 @@ class LeftPanel(wx.Panel):
     def OnPerformFit(self,event):
         # Set to show results
         self.parentFrame.showResults = True
-
         # Choose the calculated percent after import
+        eqStr = self.reddPercentCalculateTc.GetValue()
         # Iterate each part (broken by time)
         for v in self.siteData:
             # Convert elements to float (for assurance)
@@ -481,8 +481,8 @@ class LeftPanel(wx.Panel):
             alpha = [float(a.GetValue()) for a in self.alpha]
 
             # Get output of fit
-            alpha = fit_data( alpha, self.percentRedds, self.siteData,\
-                                    fitEq, rangeOfVars, "temp", dt, yrs)
+            alpha = fit_data( alpha, self.percentRedds, self.siteData, fitEq,\
+                              rangeOfVars, "temp", dt, yrs)
             # String of results
             paramResultStr = [ "a[%i] = %e" %(i,alpha[i])
                                for i in range(len(alpha))]
