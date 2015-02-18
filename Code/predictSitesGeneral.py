@@ -86,51 +86,6 @@ def predict_funct(alpha, x0, parameters, equation, rangeOfVars,
     # Return an array to do numpy/scipy stuff to
     return np.array(prediction)
 
-# Find residuals using `alpha` between data and prediction (of one site)
-def resid(alpha, data, parameters, equation, rangeOfVars):
-    '''
-        Returns an array of the differences between predicted values (based on
-        parameters) and given data for a given site.
-    '''
-    # Save array of predictions
-    pred = predict_funct(alpha, data[0], parameters, equation, rangeOfVars,
-                         tmax=len(data)-1 )
-    # Iterate to find all differences between prediction and data for each time
-    err = []
-    for i in range(len(pred)):
-        # Attempt to get difference between prediction and data points
-        try:
-            d = data[i]
-            p = pred[i]
-            # Test tha
-            e = p - d
-        # Getting data failed, make the error 0 (no effect)
-        except:
-            e = 0
-        err.append(e)
-    # Return a numpy array of differences
-    return np.array(err)
-
-# Find residuals using `alpha` between data and parameters for all sites
-def residAll(alpha, dataAll, parametersAll, equation, rangeOfVars):
-    '''
-        Returns an array of arrays of the differences between predicted values
-        (based on parameters) and given data for multiple arrays. Similar to the
-        `resid` function.
-    '''
-    errTotal = np.array([])
-    for data in dataAll:
-        # Place `resid` array into errTotal np.array
-        errTotal = concatenate( (errTotal,\
-                                 resid(\
-                                    alpha,\
-                                    data,\
-                                    parametersAll,\
-                                    equation,\
-                                    rangeOfVars)
-                                ))
-    return errTotal
-
 # Perform a fit test for multiple sites
 def fit_data(alpha, data, parameters, equation, rangeOfVars,
              paramName, dt, years=np.arange(1997,2005,1), Graph=True):
@@ -146,10 +101,24 @@ def fit_data(alpha, data, parameters, equation, rangeOfVars,
     n_window = t_window/dt
     t_range = np.arange(0,t_window,dt)
     # Fitting function is just the prediction
+    # Residuals are calculated by the difference between a particular data & prediction point  
+    residuals = lambda a,d,p,e,rV,n: d[n] - predict_funct( a, 
+                                                           d[0], 
+                                                           p, 
+                                                           e, 
+                                                           rV, 
+                                                           tmax=len(d)-1 
+                                            )[n] #get the nth value in prediction function
     # Perform fitting:
-    alphaNew, success = leastsq( residAll,
+    alphaNew, success = leastsq( residuals,
                                  alpha[:],
-                                 args=(data, parameters, equation, rangeOfVars))
+                                 args=( np.array(data[0]), 
+                                        parameters, 
+                                        equation, 
+                                        rangeOfVars,
+                                        range(len(parameters))
+                                 )
+                        )
     # Make an empty prediction array same size as the data
     pred = [0]*len(data)
 
