@@ -259,7 +259,6 @@ class LeftPanel(wx.Panel):
         self.Centre()
         self.Show(True)
 
-
     def OnClose(self,event):
         self.Close()
 
@@ -331,7 +330,6 @@ class LeftPanel(wx.Panel):
         # Set file string to location
         self.dataTemplateTc.SetValue(path)
 
-
     #
     def CreateButton(self,name,title):
         # Vertical box encompassing title and button
@@ -346,7 +344,6 @@ class LeftPanel(wx.Panel):
         buttonVbox.Add(newButton, 0, wx.CENTER, 8)
         #
         return buttonVbox
-
 
     # Perform actions to import data
     def OnImportData(self,event):
@@ -536,7 +533,7 @@ class RightPanel(wx.Panel):
         self.subTitleStr.SetFont(subTitleFont)
         self.fitParamHbox.Add(self.subTitleStr, 0)
         # Parameters
-        self.fitParamStr = wx.StaticText(self, -1, 'hi')
+        self.fitParamStr = wx.StaticText(self, -1, '')
         self.fitParamHbox.Add(self.fitParamStr, 0)
         self.vbox.Add(self.fitParamHbox, 0, wx.CENTER | wx.TOP, 10)
         self.vbox.Add((-1, 25))
@@ -562,9 +559,10 @@ class Communicate(wx.Frame):
                                      style = wx.HSCROLL|
                                              wx.VSCROLL|
                                              wx.ALWAYS_SHOW_SB)
+        # panel.DoSetSize()
         # panel.SetScrollbars( 0, 5,  0, 20/5 )
         # Pixels per scroll increment
-        panel.SetScrollRate(1,1)
+        panel.SetScrollRate(3,3)
         # Save whether to show results
         self.showResults = False
         # Create results in right panel
@@ -578,9 +576,8 @@ class Communicate(wx.Frame):
         self.hbox.Add(self.resultsPanel, 1, wx.EXPAND | wx.ALL, 5)
         panel.SetSizer(self.hbox)
         self.Update
-        # self.Left()#Centre()
         self.Show(True)
 
 app = wx.App()
-Communicate(None, -1, 'widgets communicate')
+Communicate(None, -1, 'Prediction Tool')
 app.MainLoop()
