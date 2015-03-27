@@ -102,7 +102,7 @@ class LeftPanel(wx.Panel):
         # Buttons for import
         browseForFileBtn   = wx.Button(self, -1, 'Browse for Data File')
         importSubmitBtn   = wx.Button(self, -1, 'Import Data Now')
-        # Give proper spacing
+        # Give proper spacing...
         importBtnHbox.Add(browseForFileBtn, 0)
         importBtnHbox.Add(importSubmitBtn, 0, wx.LEFT | wx.BOTTOM , 5)
         # Add to the overall vertical sizer
@@ -300,33 +300,30 @@ class LeftPanel(wx.Panel):
         # Insert in fit function at cursor
         self.funcFitTc.WriteText(chosenVar)
 
-    # Choose import file through browser
-    def OnFindImportFile(self,evet):
+    # Choose file through browser
+    def OnFindFile(self,event):
         # Create file browser dialog
         dialog = wx.FileDialog( self,
                                 "Choose some files...",
-                                "~", #default directory
+                                "",  #default directory
                                 "",
-                                "",
+                                "CSV (*.csv)|*.csv|" +\
+                                "All Files|*", #file types accepted
                                 wx.FD_OPEN)
         if dialog.ShowModal() == wx.ID_OK:
             path = str(dialog.GetPath())
         dialog.Destroy()
+        return path
+
+    # Choose import file through browser
+    def OnFindImportFile(self,event):
+        path = self.OnFindFile(event)
         # Set file string to location
         self.dataFileTc.SetValue(path)
 
     # Choose template file through browser
     def OnFindTemplateFile(self,event):
-        # Create file browser dialog
-        dialog = wx.FileDialog( self,
-                                "Choose some files...",
-                                "~", #default directory
-                                "",
-                                "",
-                                wx.FD_OPEN)
-        if dialog.ShowModal() == wx.ID_OK:
-            path = str(dialog.GetPath())
-        dialog.Destroy()
+        path = self.OnFindFile(event)
         # Set file string to location
         self.dataTemplateTc.SetValue(path)
 
