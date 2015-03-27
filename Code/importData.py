@@ -23,7 +23,12 @@ def importData(dataFile,dataTemplate="dataTemplate.csv"):
             list of lists of values for each key from the data. For example:
 
             (
-                ["Date-Start","Date-End","Number of Fish","Volume of Gravel (m^3)"],
+                [ 
+                    "Date-Start",
+                    "Date-End",
+                    "Number of Fish",
+                    "Volume of Gravel (m^3)"
+                ],
                 [
                     ["Sept-1996","Oct-1996","Nov-1996"],
                     ["Oct-1996","Nov-1996","Dec-1996"],
@@ -66,8 +71,8 @@ def importDataTemplate(dataTemplate="dataTemplate.csv"):
         Reads a given filename represented by dataTemplate.
 
         Args:
-            dataTemplate: A string representing the name of the data template where
-                only the first line is considered. The default files is
+            dataTemplate: A string representing the name of the data template 
+                where only the first line is considered. The default files is
                 "dataTemplate.csv". For example:
 
             date("%d-%b-%y"->UTC),date("%d-%b-%y"->UTC),#(int),#(float)
