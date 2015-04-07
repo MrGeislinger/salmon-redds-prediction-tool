@@ -490,10 +490,15 @@ class LeftPanel(wx.Panel):
 
 
         # Unable to get a proper value (warn user to try again)
-        except:
+        except IndexError:
+            #Warn user
+            print "Not enough parameters set."
+        except Exception as err:
             # ADD WARNING WINDOW
-            # Stop running
+            print(type(err), err)
             print "STOPPED!!!"
+        #Reset the percentRedds variable for next fitting attempt 
+        self.percentRedds = []
 
         #Make the winodow large enough
         # newSize = (1000,2500)
