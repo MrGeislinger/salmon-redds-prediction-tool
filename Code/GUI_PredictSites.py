@@ -443,16 +443,7 @@ class LeftPanel(wx.Panel):
         self.parentFrame.showResults = True
         # Choose the calculated percent after import
         eqStr = self.reddPercentCalculateTc.GetValue()
-        # Iterate each part (broken by time)
-        for v in self.siteData:
-            # Convert elements to float (for assurance)
-            v = map(float,v)
-            # Append result to list
-            self.percentRedds.append( eval(eqStr))
-        # List within list is needed for predicting method
-        self.percentRedds = [self.percentRedds]
-
-        # Get Fit Function
+                # Get Fit Function
         functString = self.funcFitTc.GetValue()
         # Define a function that will evaluate the one given
         def fitEq(a,x,v):
@@ -462,6 +453,27 @@ class LeftPanel(wx.Panel):
 
         # Get what varaibles are used
         rangeOfVars = self.varNumsFromString(functString)
+
+        # Check to see that no variables used in `allVars` is `None`
+        # Note that `varsUsed` contains the indexes of variables used in `v`
+        def noUsedVarIsNone(allVars,varsUsed):
+            # If a used variable is `None`, stop and return False 
+            for i in varsUsed:
+                if allVars[varUsed] is None:
+                    return False
+            # No variable is `None`
+            return True
+
+        # Iterate each part (broken by time)
+        for v in self.siteData:
+            # No 
+            if noUsedVarIsNone(v,rangeOfVars):
+                v = map(float,v)
+                # Append result to list
+                self.percentRedds.append( eval(eqStr))
+        # List within list is needed for predicting method
+        self.percentRedds = [self.percentRedds]
+
 
         #TEST Input
         dt = 1    #increase time (1 = one year)
