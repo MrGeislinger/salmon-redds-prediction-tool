@@ -465,15 +465,17 @@ class LeftPanel(wx.Panel):
             return True
 
         # Iterate each part (broken by time)
-        for v in self.siteData:
-            # No 
+        for v in self.siteData[:]:
+            # All used variables are numerically defined
             if noUsedVarIsNone(v,rangeOfVars):
                 v = map(float,v)
                 # Append result to list
                 self.percentRedds.append( eval(eqStr))
+            # Remove the data for this time and continue
+            else:
+                self.siteData.remove(v)
         # List within list is needed for predicting method
         self.percentRedds = [self.percentRedds]
-
 
         #TEST Input
         dt = 1    #increase time (1 = one year)
@@ -502,9 +504,10 @@ class LeftPanel(wx.Panel):
 
 
         # Unable to get a proper value (warn user to try again)
-        except IndexError:
+        except IndexError as err:
             #Warn user
             print "Not enough parameters set."
+            print err
         except Exception as err:
             # ADD WARNING WINDOW
             print(type(err), err)
