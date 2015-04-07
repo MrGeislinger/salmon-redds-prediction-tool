@@ -418,7 +418,7 @@ class LeftPanel(wx.Panel):
                 str0 = 'v['
                 index = functionString.index(str0)
                 # Remove all the stuff beofre
-                functionString = functionString[indext+len(str0):]
+                functionString = functionString[index+len(str0):]
                 # Get the number until "]"
                 try:
                     str1 = ']'
@@ -459,7 +459,7 @@ class LeftPanel(wx.Panel):
         def noUsedVarIsNone(allVars,varsUsed):
             # If a used variable is `None`, stop and return False 
             for i in varsUsed:
-                if allVars[varUsed] is None:
+                if allVars[i] is None:
                     return False
             # No variable is `None`
             return True
