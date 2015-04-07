@@ -464,11 +464,12 @@ class LeftPanel(wx.Panel):
             # No variable is `None`
             return True
 
+
         # Iterate each part (broken by time)
         for v in self.siteData[:]:
             # All used variables are numerically defined
             if noUsedVarIsNone(v,rangeOfVars):
-                v = map(float,v)
+                v = map(lambda x: None if x is None else float(x),v)
                 # Append result to list
                 self.percentRedds.append( eval(eqStr))
             # Remove the data for this time and continue
