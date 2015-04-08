@@ -451,8 +451,8 @@ class LeftPanel(wx.Panel):
             result = eval(functString)
             return result
 
-        # Get what varaibles are used
-        rangeOfVars = self.varNumsFromString(functString)
+        # Get what varaibles are used (including the variables used for percent of redds)
+        rangeOfVars = self.varNumsFromString(functString) + self.varNumsFromString(eqStr)
 
         # Check to see that no variables used in `allVars` is `None`
         # Note that `varsUsed` contains the indexes of variables used in `v`
